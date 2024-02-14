@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public class MainGenerator {
 
-    public static void main(String[] args) throws TemplateException, IOException {
+    public static void doGenerate(MainTemplateConfig mainTemplateConfig) throws TemplateException, IOException {
         String projectPath = System.getProperty("user.dir");
         String inputPath = projectPath + File.separator+ "sjxm-generator-demo-projects"+ File.separator+"acm-template";
         String outputPath = projectPath;
@@ -22,11 +22,6 @@ public class MainGenerator {
 
         String dynamicInputPath = projectPath + File.separator+"sjxm-generator-basic"+File.separator + "src/main/resources/templates/MainTemplate.java.ftl";
         String dynamicOutputPath = projectPath + File.separator + "acm-template/src/com/sjxm/acm/MainTemplate.java";
-
-        MainTemplateConfig mainTemplateConfig = new MainTemplateConfig();
-        mainTemplateConfig.setAuthor("sjxm0721");
-        mainTemplateConfig.setLoop(false);
-        mainTemplateConfig.setOutputText("result:");
 
         DynamicGenerator.doGenerate(dynamicInputPath,dynamicOutputPath,mainTemplateConfig);
     }
