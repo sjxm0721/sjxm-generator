@@ -1,5 +1,7 @@
 package com.sjxm.generator;
 
+import cn.hutool.core.io.FileUtil;
+
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -42,6 +44,10 @@ public class DynamicGenerator {
         //创建模板对象，加载指定模板
         String templateName = new File(inputPath).getName();
         Template template = configuration.getTemplate(templateName);
+
+        if (!FileUtil.exist(outputPath)) {
+            FileUtil.touch(outputPath);
+        }
 
         Writer fileWriter = new FileWriter(outputPath);
 

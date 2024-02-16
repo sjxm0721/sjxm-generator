@@ -14,15 +14,30 @@ import java.io.IOException;
 public class MainGenerator {
 
     public static void doGenerate(MainTemplateConfig mainTemplateConfig) throws TemplateException, IOException {
-        String projectPath = System.getProperty("user.dir");
-        String inputPath = projectPath + File.separator+ "sjxm-generator-demo-projects"+ File.separator+"acm-template";
-        String outputPath = projectPath;
-        StaticGenerator.copyFilesByRecursive(inputPath,outputPath);
+
+        String inputRootPath = "/Users/sijixiamu/code/java_code/javaTest/yupicloud/sjxm-generator/sjxm-generator-demo-projects/acm-template-pro";
+        String outputRootPath = "/Users/sijixiamu/code/java_code/javaTest/yupicloud/sjxm-generator";
+
+        String inputPath;
+        String outputPath;
+
+        //生成动态文件
+        inputPath = new File(inputRootPath, "src/com/sjxm/acm/MainTemplate.java.ftl").getAbsolutePath();
+        outputPath = new File(outputRootPath,"src/com/sjxm/acm/MainTemplate.java").getAbsolutePath();
+
+        DynamicGenerator.doGenerate(inputPath, outputPath,mainTemplateConfig);
 
 
-        String dynamicInputPath = projectPath + File.separator+"sjxm-generator-basic"+File.separator + "src/main/resources/templates/MainTemplate.java.ftl";
-        String dynamicOutputPath = projectPath + File.separator + "acm-template/src/com/sjxm/acm/MainTemplate.java";
+        //生成静态文件
+        inputPath = new File(inputRootPath, ".gitignore").getAbsolutePath();
+        outputPath = new File(outputRootPath,".gitignore").getAbsolutePath();
 
-        DynamicGenerator.doGenerate(dynamicInputPath,dynamicOutputPath,mainTemplateConfig);
+        StaticGenerator.copyFilesByHutool(inputPath,outputPath);
+
+        inputPath = new File(inputRootPath, "README.md").getAbsolutePath();
+        outputPath = new File(outputRootPath,"README.md").getAbsolutePath();
+
+        StaticGenerator.copyFilesByHutool(inputPath,outputPath);
+
     }
 }

@@ -16,9 +16,9 @@ public class ListCommand implements Runnable {
     @Override
     public void run() {
         String projectPath = System.getProperty("user.dir");
-//        File parentFile = new File(projectPath).getParentFile();
+        File parentFile = new File(projectPath).getParentFile();
         //输入路径
-        String inputPath = new File("sjxm-generator-demo-projects/acm-template").getAbsolutePath();
+        String inputPath = new File(parentFile,"sjxm-generator-demo-projects/acm-template").getAbsolutePath();
         List<File> files = FileUtil.loopFiles(inputPath);
         for (File file : files) {
             System.out.println(file);

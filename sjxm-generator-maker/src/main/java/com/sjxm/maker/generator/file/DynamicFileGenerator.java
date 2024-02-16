@@ -1,5 +1,6 @@
-package com.sjxm.generator;
+package com.sjxm.maker.generator.file;
 
+import cn.hutool.core.io.FileUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -14,10 +15,7 @@ import java.io.Writer;
  * @Date: 2024/2/13
  * @Description: 动态文件生成器
  */
-public class DynamicGenerator {
-    public static void main(String[] args) {
-
-    }
+public class DynamicFileGenerator {
 
     /**
      *
@@ -43,6 +41,12 @@ public class DynamicGenerator {
         String templateName = new File(inputPath).getName();
         Template template = configuration.getTemplate(templateName);
 
+        //如果文件不存在则创建目录
+        if(!FileUtil.exist(outputPath)){
+            FileUtil.touch(outputPath);
+        }
+
+        //生成
         Writer fileWriter = new FileWriter(outputPath);
 
         template.process(model,fileWriter);
