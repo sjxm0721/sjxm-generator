@@ -3,6 +3,7 @@
 .idea
 sjxm-generator.iml
 sjxm-generator-basic.iml
+.temp
 
 
 ### Java template

@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 /**
  * ACM 输入模板（多数之和）
- * @author 四季夏目07211
+ * @author aaa
  */
 public class MainTemplate {
     public static void main(String[] args) {
@@ -27,7 +27,7 @@ public class MainTemplate {
                 sum += num;
             }
 
-            System.out.println("结果为为：" + sum);
+            System.out.println("bbb" + sum);
     }
 
         scanner.close();

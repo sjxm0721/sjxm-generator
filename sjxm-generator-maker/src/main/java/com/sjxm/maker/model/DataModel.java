@@ -12,18 +12,18 @@ import lombok.Data;
 public class DataModel {
 
     /**
-     * 作者
+     * 是否生成.gitignore文件
      */
-    private String author = "四季夏目";
-
-    /**
-     * 输出文本
-     */
-    private String outputText = "输出结果：";
+    public boolean needGit = true;
 
     /**
      * 是否循环
      */
     private boolean loop;
+
+    /**
+     * 核心模板
+     */
+    private MainTemplate mainTemplate;
 
 }

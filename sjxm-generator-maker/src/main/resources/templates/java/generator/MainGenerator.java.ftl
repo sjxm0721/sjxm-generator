@@ -2,8 +2,22 @@ package ${basePackage}.generator;
 
 import freemarker.template.TemplateException;
 
+import ${basePackage}.model.DataModel;
+
 import java.io.File;
 import java.io.IOException;
+
+
+<#macro generateFile indent fileInfo>
+    ${indent}inputPath = new File(inputRootPath, "${fileInfo.inputPath}").getAbsolutePath();
+    ${indent}outputPath = new File(outputRootPath,"${fileInfo.outputPath}").getAbsolutePath();
+    <#if fileInfo.generateType == "static">
+        ${indent}StaticGenerator.copyFilesByHutool(inputPath,outputPath);
+    <#else>
+        ${indent}DynamicGenerator.doGenerate(inputPath, outputPath,object);
+    </#if>
+</#macro>
+
 
 /**
  * @Author: 四季夏目
@@ -12,7 +26,7 @@ import java.io.IOException;
  */
 public class MainGenerator {
 
-    public static void doGenerate(Object object) throws TemplateException, IOException {
+    public static void doGenerate(DataModel object) throws TemplateException, IOException {
 
         String inputRootPath = "${fileConfig.inputRootPath}";
         String outputRootPath = "${fileConfig.outputRootPath}";
@@ -20,13 +34,41 @@ public class MainGenerator {
         String inputPath;
         String outputPath;
 
-<#list fileConfig.files as fileInfo>
-    inputPath = new File(inputRootPath, "${fileInfo.inputPath}").getAbsolutePath();
-    outputPath = new File(outputRootPath,"${fileInfo.outputPath}").getAbsolutePath();
-    <#if fileInfo.generateType == "static">
-        StaticGenerator.copyFilesByHutool(inputPath,outputPath);
+<#list modelConfig.models as modelInfo>
+<#--    有分组-->
+    <#if modelInfo.groupKey??>
+        <#list modelInfo.models as subModelInfo>
+            ${subModelInfo.type} ${subModelInfo.fieldName} = object.${modelInfo.groupKey}.${subModelInfo.fieldName};
+        </#list>
     <#else>
-        DynamicGenerator.doGenerate(inputPath, outputPath,object);
+        ${modelInfo.type} ${modelInfo.fieldName} = object.${modelInfo.fieldName};
+    </#if>
+</#list>
+
+<#list fileConfig.files as fileInfo>
+    <#if fileInfo.groupKey??>
+        //groupKey = ${fileInfo.groupKey}
+        <#if fileInfo.condition??>
+            if(${fileInfo.condition}){
+        </#if>
+            <#list fileInfo.files as fileInfo>
+                <@generateFile indent="    "  fileInfo=fileInfo />
+            </#list>
+        <#if fileInfo.condition??>
+            }
+        </#if>
+        <#else>
+
+            <#if fileInfo.condition??>
+                if(${fileInfo.condition}){
+            </#if>
+
+            <@generateFile indent="" fileInfo=fileInfo/>
+
+            <#if fileInfo.condition??>
+                }
+            </#if>
+
     </#if>
 
 </#list>

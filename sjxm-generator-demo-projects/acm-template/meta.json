@@ -1,0 +1,24 @@
+{
+    "name": "acm-template-generator",
+    "description": "ACM项目模板生成器",
+    "fileConfig": {
+        "sourceRootPath": "/Users/sijixiamu/code/java_code/javaTest/yupicloud/sjxm-generator/sjxm-generator-demo-projects/acm-template",
+        "files": [
+            {
+                "inputPath": "src/com/sjxm/acm/MainTemplate.java",
+                "outputPath": "src/com/sjxm/acm/MainTemplate.java.ftl",
+                "type": "file",
+                "generateType": "dynamic"
+            }
+        ]
+    },
+    "modelConfig": {
+        "models": [
+            {
+                "fieldName": "outputText",
+                "type": "String",
+                "defaultValue": "sum = "
+            }
+        ]
+    }
+}
