@@ -16,41 +16,84 @@ import java.util.concurrent.Callable;
 @Data
 public class GenerateCommand implements Callable<Integer> {
 
-    @Option(names = {"--needGit"}, arity = "0..1", description = "是否生成 .gitignore 文件", interactive = true, echo = true)
-    private boolean needGit = true;
-
-
-    @Option(names = {"-l", "--loop"}, arity = "0..1", description = "是否生成循环", interactive = true, echo = true)
-    private boolean loop = false;
-
-
-        static DataModel.MainTemplate mainTemplate = new DataModel.MainTemplate();
-        @Command(name = "核心模板",description="用于生成核心模板文件")
+        static DataModel.MysqlConfig mysqlConfig = new DataModel.MysqlConfig();
+        @Command(name = "MySQL数据库配置",description="用于生成MySQL数据库配置")
         @Data
-        public static class MainTemplateCommand implements Runnable{
-        @Option(names = {"-a", "--author"}, arity = "0..1", description = "作者注释", interactive = true, echo = true)
-        private String author = "sjxm";
-        @Option(names = {"-o", "--outputText"}, arity = "0..1", description = "输出信息", interactive = true, echo = true)
-        private String outputText = "sum = ";
+        public static class MysqlConfigCommand implements Runnable{
+        @Option(names = {"--password"}, arity = "0..1", description = "密码", interactive = true, echo = true)
+        private String password = "123456";
+        @Option(names = {"--url"}, arity = "0..1", description = "地址", interactive = true, echo = true)
+        private String url = "jdbc:mysql://localhost:3306/my_db";
+        @Option(names = {"--username"}, arity = "0..1", description = "用户名", interactive = true, echo = true)
+        private String username = "root";
 
         @Override
         public void run(){
-                mainTemplate.author = author;
-                mainTemplate.outputText = outputText;
+                mysqlConfig.password = password;
+                mysqlConfig.url = url;
+                mysqlConfig.username = username;
         }
         }
+
+
+        static DataModel.DocsConfig docsConfig = new DataModel.DocsConfig();
+        @Command(name = "接口文档配置",description="用于生成接口文档配置")
+        @Data
+        public static class DocsConfigCommand implements Runnable{
+        @Option(names = {"--description"}, arity = "0..1", description = "接口文档描述", interactive = true, echo = true)
+        private String description = "springboot-init";
+        @Option(names = {"--title"}, arity = "0..1", description = "接口文档标题", interactive = true, echo = true)
+        private String title = "接口文档";
+        @Option(names = {"--version"}, arity = "0..1", description = "接口文档版本", interactive = true, echo = true)
+        private String version = "1.0";
+
+        @Override
+        public void run(){
+                docsConfig.description = description;
+                docsConfig.title = title;
+                docsConfig.version = version;
+        }
+        }
+
+
+    @Option(names = {"--needDocs"}, arity = "0..1", description = "是否开启接口文档功能", interactive = true, echo = true)
+    private boolean needDocs = true;
+
+
+    @Option(names = {"--needPost"}, arity = "0..1", description = "是否开启帖子功能", interactive = true, echo = true)
+    private boolean needPost = true;
+
+
+    @Option(names = {"--needCors"}, arity = "0..1", description = "是否开启跨域功能", interactive = true, echo = true)
+    private boolean needCors = true;
+
+
+    @Option(names = {"--needEs"}, arity = "0..1", description = "是否开启ES功能", interactive = true, echo = true)
+    private boolean needEs = true;
+
+
+    @Option(names = {"--basePackage"}, arity = "0..1", description = "基础包名", interactive = true, echo = true)
+    private String basePackage = "com.yupi";
+
+
+    @Option(names = {"--needRedis"}, arity = "0..1", description = "是否开启Redis功能", interactive = true, echo = true)
+    private boolean needRedis = true;
 
 
 
     public Integer call() throws Exception {
-                if(loop){
-            System.out.println("输入核心模板配置：");
-            CommandLine commandLine = new CommandLine(MainTemplateCommand.class);
-            commandLine.execute("--author", "--outputText");
+        System.out.println("输入MySQL数据库配置配置：");
+        CommandLine mysqlConfigCommandLine = new CommandLine(MysqlConfigCommand.class);
+        mysqlConfigCommandLine.execute("--password", "--url", "--username");
+                if(needDocs){
+            System.out.println("输入接口文档配置配置：");
+            CommandLine docsConfigCommandLine = new CommandLine(DocsConfigCommand.class);
+            docsConfigCommandLine.execute("--description", "--title", "--version");
                 }
         DataModel dataModel = new DataModel();
         BeanUtil.copyProperties(this, dataModel);
-            dataModel.mainTemplate = mainTemplate;
+            dataModel.mysqlConfig = mysqlConfig;
+            dataModel.docsConfig = docsConfig;
         MainGenerator.doGenerate(dataModel);
         return 0;
     }

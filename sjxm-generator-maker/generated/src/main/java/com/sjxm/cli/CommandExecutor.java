@@ -12,7 +12,7 @@ import picocli.CommandLine.Command;
  * @Description:
  */
 
-@Command(name="acm-template-pro-generator",mixinStandardHelpOptions = true)
+@Command(name="springboot-init-generator",mixinStandardHelpOptions = true)
 public class CommandExecutor implements Runnable{
 
     private final CommandLine commandLine;

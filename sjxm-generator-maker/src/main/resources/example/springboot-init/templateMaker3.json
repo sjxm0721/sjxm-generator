@@ -1,0 +1,22 @@
+{
+  "id": 1,
+  "originProjectPath": "../../../sjxm-generator-demo-projects/springboot-init",
+  "fileConfig": {
+    "files": [
+      {
+        "path": "src/main/java/com/yupi/springbootinit/config/CorsConfig.java",
+        "condition": "needCors"
+      }
+    ]
+  },
+  "modelConfig": {
+    "models": [
+      {
+        "fieldName": "needCors",
+        "type": "boolean",
+        "description": "是否开启跨域功能",
+        "defaultValue": true
+      }
+    ]
+  }
+}

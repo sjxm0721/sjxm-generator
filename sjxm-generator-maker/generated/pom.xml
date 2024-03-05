@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.sjxm</groupId>
-    <artifactId>acm-template-pro-generator</artifactId>
+    <artifactId>springboot-init-generator</artifactId>
     <version>1.0</version>
 
     <dependencies>
