@@ -1,7 +1,9 @@
 package com.sjxm.maker;
 //import com.sjxm.maker.cli.CommandExecutor;
 
+import com.sjxm.maker.generator.main.GenerateTemplate;
 import com.sjxm.maker.generator.main.MainGenerator;
+import com.sjxm.maker.generator.main.ZipGenerator;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
@@ -14,7 +16,7 @@ import java.io.IOException;
 // 然后按 Enter 键。现在，您可以在代码中看到空格字符。
 public class Main {
     public static void main(String[] args) throws TemplateException, IOException, InterruptedException {
-        MainGenerator mainGenerator = new MainGenerator();
-        mainGenerator.doGenerate();
+        GenerateTemplate generateTemplate = new ZipGenerator();
+        generateTemplate.doGenerate();
     }
 }

@@ -3,6 +3,7 @@ package com.sjxm.maker.generator.main;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
 import com.sjxm.maker.generator.JarGenerator;
 import com.sjxm.maker.generator.ScriptGenerator;
 import com.sjxm.maker.generator.file.DynamicFileGenerator;
@@ -55,7 +56,7 @@ public abstract class GenerateTemplate {
     }
 
 
-    protected  void buildDist(String outputPath, String sourceCopyDestPath, String shellOutputFilePath, String jarPath) {
+    protected  String buildDist(String outputPath, String sourceCopyDestPath, String shellOutputFilePath, String jarPath) {
         //生成精简版的程序（产物包）
         String distOutputPath = outputPath + "-dist";
 
@@ -70,6 +71,8 @@ public abstract class GenerateTemplate {
         FileUtil.copy(shellOutputFilePath + ".bat",distOutputPath,true);
 
         FileUtil.copy(sourceCopyDestPath,distOutputPath,true);
+
+        return distOutputPath;
     }
 
     
@@ -155,5 +158,16 @@ public abstract class GenerateTemplate {
         String sourceCopyDestPath = outputPath + File.separator + ".source";
         FileUtil.copy(sourceRootPath,sourceCopyDestPath,false);
         return sourceCopyDestPath;
+    }
+
+    /**
+     * 制作压缩包
+     * @param outputPath
+     * @return 压缩包路径
+     */
+    protected String buildZip(String outputPath){
+        String zipPath = outputPath + ".zip";
+        ZipUtil.zip(outputPath,zipPath);
+        return zipPath;
     }
 }
