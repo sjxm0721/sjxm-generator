@@ -5,7 +5,7 @@ package com.sjxm.maker.meta.enums;
  * @Date: 2024/2/18
  * @Description:
  */
-public enum FileGenerateEnum {
+public enum FileGenerateTypeEnum {
 
     DYNAMIC("动态","dynamic"),
     STATIC("静态","static");
@@ -14,7 +14,7 @@ public enum FileGenerateEnum {
 
     private final String value;
 
-    FileGenerateEnum(String text, String value){
+    FileGenerateTypeEnum(String text, String value){
         this.text = text;
         this.value = value;
     }

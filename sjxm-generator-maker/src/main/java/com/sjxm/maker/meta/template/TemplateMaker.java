@@ -7,7 +7,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.sjxm.maker.meta.Meta;
-import com.sjxm.maker.meta.enums.FileGenerateEnum;
+import com.sjxm.maker.meta.enums.FileGenerateTypeEnum;
 import com.sjxm.maker.meta.enums.FileTypeEnum;
 import com.sjxm.maker.meta.template.model.TemplateMakerFileConfig;
 import com.sjxm.maker.meta.template.model.TemplateMakerModelConfig;
@@ -277,18 +277,18 @@ public class TemplateMaker {
         fileInfo.setOutputPath(fileInputPath);
         fileInfo.setType(FileTypeEnum.FILE.getValue());
         fileInfo.setCondition(fileInfoConfig.getCondition());
-        fileInfo.setGenerateType(FileGenerateEnum.DYNAMIC.getValue());
+        fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
 
         boolean contentEquals = newFileContent.equals(fileContent);
         //和原文件一致，没有挖坑，且不存在模板文件,静态生成
         if(!hasTemplateFile){
             if(contentEquals){
                 fileInfo.setInputPath(fileInputPath);
-                fileInfo.setGenerateType(FileGenerateEnum.STATIC.getValue());
+                fileInfo.setGenerateType(FileGenerateTypeEnum.STATIC.getValue());
             }
             else{
                 fileInfo.setOutputPath(fileInputPath);
-                fileInfo.setGenerateType(FileGenerateEnum.DYNAMIC.getValue());
+                fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
 
                 //输出模板文件
                 FileUtil.writeUtf8String(newFileContent,fileOutputAbsolutePath);

@@ -8,7 +8,7 @@
   "fileConfig": {
     "inputRootPath": ".source/acm-template-pro",
     "sourceRootPath": "/Users/sijixiamu/code/java_code/javaTest/yupicloud/sjxm-generator/sjxm-generator-demo-projects/acm-template-pro",
-    "outputRootPath": "/Users/sijixiamu/code/java_code/javaTest/yupicloud/sjxm-generator/generated",
+    "outputRootPath": "generated",
     "type": "dir",
     "files": [
       {

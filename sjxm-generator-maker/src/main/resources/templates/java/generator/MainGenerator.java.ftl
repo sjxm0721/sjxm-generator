@@ -10,67 +10,68 @@ import java.io.IOException;
 
 <#macro generateFile indent fileInfo>
     ${indent}inputPath = new File(inputRootPath, "${fileInfo.inputPath}").getAbsolutePath();
-    ${indent}outputPath = new File(outputRootPath,"${fileInfo.outputPath}").getAbsolutePath();
+    ${indent}outputPath = new File(outputRootPath, "${fileInfo.outputPath}").getAbsolutePath();
     <#if fileInfo.generateType == "static">
-        ${indent}StaticGenerator.copyFilesByHutool(inputPath,outputPath);
+        ${indent}StaticGenerator.copyFilesByHutool(inputPath, outputPath);
     <#else>
-        ${indent}DynamicGenerator.doGenerate(inputPath, outputPath,object);
+        ${indent}DynamicGenerator.doGenerate(inputPath, outputPath, model);
     </#if>
 </#macro>
 
-
 /**
- * @Author: 四季夏目
- * @Date: 2024/2/13
- * @Description:
- */
+* 核心生成器
+*/
 public class MainGenerator {
 
-    public static void doGenerate(DataModel object) throws TemplateException, IOException {
+/**
+* 生成
+*
+* @param model 数据模型
+* @throws TemplateException
+* @throws IOException
+*/
+public static void doGenerate(DataModel model) throws TemplateException, IOException {
+String inputRootPath = "${fileConfig.inputRootPath}";
+String outputRootPath = "${fileConfig.outputRootPath}";
 
-        String inputRootPath = "${fileConfig.inputRootPath}";
-        String outputRootPath = "${fileConfig.outputRootPath}";
+String inputPath;
+String outputPath;
 
-        String inputPath;
-        String outputPath;
-
+<#-- 获取模型变量 -->
 <#list modelConfig.models as modelInfo>
-<#--    有分组-->
+<#-- 有分组 -->
     <#if modelInfo.groupKey??>
         <#list modelInfo.models as subModelInfo>
-            ${subModelInfo.type} ${subModelInfo.fieldName} = object.${modelInfo.groupKey}.${subModelInfo.fieldName};
+            ${subModelInfo.type} ${subModelInfo.fieldName} = model.${modelInfo.groupKey}.${subModelInfo.fieldName};
         </#list>
     <#else>
-        ${modelInfo.type} ${modelInfo.fieldName} = object.${modelInfo.fieldName};
+        ${modelInfo.type} ${modelInfo.fieldName} = model.${modelInfo.fieldName};
     </#if>
 </#list>
 
 <#list fileConfig.files as fileInfo>
     <#if fileInfo.groupKey??>
-        //groupKey = ${fileInfo.groupKey}
+        // groupKey = ${fileInfo.groupKey}
         <#if fileInfo.condition??>
-            if(${fileInfo.condition}){
-        </#if>
+            if (${fileInfo.condition}) {
             <#list fileInfo.files as fileInfo>
-                <@generateFile indent="    "  fileInfo=fileInfo />
+                <@generateFile fileInfo=fileInfo indent="            " />
             </#list>
-        <#if fileInfo.condition??>
             }
-        </#if>
         <#else>
-
-            <#if fileInfo.condition??>
-                if(${fileInfo.condition}){
-            </#if>
-
-            <@generateFile indent="" fileInfo=fileInfo/>
-
-            <#if fileInfo.condition??>
-                }
-            </#if>
-
+            <#list fileInfo.files as fileInfo>
+                <@generateFile fileInfo=fileInfo indent="        " />
+            </#list>
+        </#if>
+    <#else>
+        <#if fileInfo.condition??>
+            if(${fileInfo.condition}) {
+            <@generateFile fileInfo=fileInfo indent="            " />
+            }
+        <#else>
+            <@generateFile fileInfo=fileInfo indent="        " />
+        </#if>
     </#if>
-
 </#list>
-    }
+}
 }

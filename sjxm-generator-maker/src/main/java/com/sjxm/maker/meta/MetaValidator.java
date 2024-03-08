@@ -1,13 +1,12 @@
 package com.sjxm.maker.meta;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
-import com.sjxm.maker.meta.enums.FileGenerateEnum;
+import com.sjxm.maker.meta.enums.FileGenerateTypeEnum;
 import com.sjxm.maker.meta.enums.FileTypeEnum;
+import com.sjxm.maker.meta.enums.ModelTypeEnum;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -15,9 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @Author: 四季夏目
- * @Date: 2024/2/17
- * @Description:
+ * 元信息校验
  */
 public class MetaValidator {
 
@@ -38,17 +35,18 @@ public class MetaValidator {
             return;
         }
         for (Meta.ModelConfig.ModelInfo modelInfo : modelInfoList) {
-            //为group，不校验
+            // 为 group，不校验
             String groupKey = modelInfo.getGroupKey();
-            if(StrUtil.isNotEmpty(groupKey)){
-                //生成中间参数
+            if (StrUtil.isNotEmpty(groupKey)) {
+                // 生成中间参数
                 List<Meta.ModelConfig.ModelInfo> subModelInfoList = modelInfo.getModels();
-                String allArgsStr = subModelInfoList.stream().map(subModelInfo -> {
-                    return String.format("\"--%s\"", subModelInfo.getFieldName());
-                }).collect(Collectors.joining(", "));
+                String allArgsStr = modelInfo.getModels().stream()
+                        .map(subModelInfo -> String.format("\"--%s\"", subModelInfo.getFieldName()))
+                        .collect(Collectors.joining(", "));
                 modelInfo.setAllArgsStr(allArgsStr);
                 continue;
             }
+
             // 输出路径默认值
             String fieldName = modelInfo.getFieldName();
             if (StrUtil.isBlank(fieldName)) {
@@ -57,7 +55,7 @@ public class MetaValidator {
 
             String modelInfoType = modelInfo.getType();
             if (StrUtil.isEmpty(modelInfoType)) {
-                modelInfo.setType("String");
+                modelInfo.setType(ModelTypeEnum.STRING.getValue());
             }
         }
     }
@@ -75,7 +73,7 @@ public class MetaValidator {
         }
         // inputRootPath：.source + sourceRootPath 的最后一个层级路径
         String inputRootPath = fileConfig.getInputRootPath();
-        String defaultInputRootPath = ".source" + File.separator + FileUtil.getLastPathEle(Paths.get(sourceRootPath)).getFileName().toString();
+        String defaultInputRootPath = ".source/" + FileUtil.getLastPathEle(Paths.get(sourceRootPath)).getFileName().toString();
         if (StrUtil.isEmpty(inputRootPath)) {
             fileConfig.setInputRootPath(defaultInputRootPath);
         }
@@ -97,11 +95,12 @@ public class MetaValidator {
             return;
         }
         for (Meta.FileConfig.FileInfo fileInfo : fileInfoList) {
-            // inputPath: 必填(Group除外)
             String type = fileInfo.getType();
-            if(FileTypeEnum.GROUP.getValue().equals(type)){
+            // 类型为 group，不校验
+            if (FileTypeEnum.GROUP.getValue().equals(type)) {
                 continue;
             }
+            // inputPath: 必填
             String inputPath = fileInfo.getInputPath();
             if (StrUtil.isBlank(inputPath)) {
                 throw new MetaException("未填写 inputPath");
@@ -126,9 +125,9 @@ public class MetaValidator {
             if (StrUtil.isBlank(generateType)) {
                 // 为动态模板
                 if (inputPath.endsWith(".ftl")) {
-                    fileInfo.setGenerateType(FileGenerateEnum.DYNAMIC.getValue());
+                    fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
                 } else {
-                    fileInfo.setGenerateType(FileGenerateEnum.STATIC.getValue());
+                    fileInfo.setGenerateType(FileGenerateTypeEnum.STATIC.getValue());
                 }
             }
         }

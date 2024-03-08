@@ -34,7 +34,7 @@ public class FileGenerator {
         // 生成静态文件
         StaticFileGenerator.copyFilesByHutool(inputPath, outputPath);
         // 生成动态文件
-        String inputDynamicFilePath = projectPath + File.separator + "src/main/resources/templates/MainTemplate.java.ftl";
+        String inputDynamicFilePath = projectPath + File.separator + "src/main/resources/templates/DataModel.java.ftl.ftl";
         String outputDynamicFilePath = outputPath + File.separator + "acm-template/src/com/sjxm/acm/MainTemplate.java";
         DynamicFileGenerator.doGenerate(inputDynamicFilePath, outputDynamicFilePath, dataModel);
     }

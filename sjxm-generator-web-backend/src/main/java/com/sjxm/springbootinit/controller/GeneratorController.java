@@ -1,6 +1,8 @@
 package com.sjxm.springbootinit.controller;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.qcloud.cos.model.COSObject;
@@ -16,10 +18,7 @@ import com.sjxm.springbootinit.exception.BusinessException;
 import com.sjxm.springbootinit.exception.ThrowUtils;
 import com.sjxm.springbootinit.manager.CosManager;
 import com.sjxm.springbootinit.meta.Meta;
-import com.sjxm.springbootinit.model.dto.generator.GeneratorAddRequest;
-import com.sjxm.springbootinit.model.dto.generator.GeneratorEditRequest;
-import com.sjxm.springbootinit.model.dto.generator.GeneratorQueryRequest;
-import com.sjxm.springbootinit.model.dto.generator.GeneratorUpdateRequest;
+import com.sjxm.springbootinit.model.dto.generator.*;
 import com.sjxm.springbootinit.model.entity.Generator;
 import com.sjxm.springbootinit.model.entity.User;
 import com.sjxm.springbootinit.model.vo.GeneratorVO;
@@ -32,8 +31,14 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 帖子接口
@@ -302,4 +307,109 @@ public class GeneratorController {
         }
     }
 
+
+
+    /**
+     * 根据id下载
+     * @param generatorUseRequest
+     * @param request
+     * @param response
+     */
+    @PostMapping("/use")
+    public void useGenerator(@RequestBody GeneratorUseRequest generatorUseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //获取用户输入的请求参数
+        Long id = generatorUseRequest.getId();
+        Map<String, Object> dataModel = generatorUseRequest.getDataModel();
+        //需要用户登录
+        User loginUser = userService.getLoginUser(request);
+        log.info("userId = {} 使用了生成器ID = {}",loginUser.getId(),id);
+
+        Generator generator = generatorService.getById(id);
+        if(generator == null){
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+
+        //生成器的存储路径
+        String disPath = generator.getDistPath();
+        if(StrUtil.isBlank(disPath)){
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"产物包不存在");
+        }
+
+        //从对象存储下载生成器的压缩包
+
+        //定义独立的工作空间
+        String projectPath = System.getProperty("user.dir");
+        String tempDirPath = String.format("%s/.temp/use/%s",projectPath,id);
+        String zipFilePath = tempDirPath + "/dist.zip";
+
+        if(!FileUtil.exist(zipFilePath)){
+            FileUtil.touch(zipFilePath);
+        }
+
+        try{
+            cosManager.download(disPath,zipFilePath);
+        }catch (Exception e){
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR,"生成器下载失败");
+        }
+
+        //解压压缩包，得到脚本文件
+        File unzipDistDir = ZipUtil.unzip(zipFilePath);
+
+
+        //将用户输入的参数写到Json文件中
+        String dataModelFilePath = tempDirPath + "/dataModel.json";
+        String jsonStr = JSONUtil.toJsonStr(dataModel);
+        FileUtil.writeUtf8String(jsonStr,dataModelFilePath);
+
+        //执行脚本
+        //找到脚本文件路径
+        File scriptFile = FileUtil.loopFiles(unzipDistDir, 2, null).stream().filter(file ->
+                file.isFile() && "generator".equals(file.getName())).findFirst().orElseThrow(RuntimeException::new);
+
+        //添加可执行权限
+        try{
+            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxrwxrwx");
+            Files.setPosixFilePermissions(scriptFile.toPath(),permissions);
+        }catch (Exception e){
+
+        }
+
+        //压缩得到的生成结果，返回给前端
+        File scriptDir= scriptFile.getParentFile();
+        String[] commands = new String[]{"./generator","json-generate","--file="+dataModelFilePath};
+
+        ProcessBuilder processBuilder = new ProcessBuilder(commands);
+        processBuilder.directory(scriptDir);
+
+        try {
+            Process process = processBuilder.start();
+
+            //读取命令的输出
+            InputStream inputStream = process.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while((line = reader.readLine()) !=null){
+                System.out.println(line);
+            }
+            //等待命令执行完成
+            int exitCode = process.waitFor();
+            System.out.println("命令执行结束,退出码："+exitCode);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR,"执行生成器脚本错误");
+        }
+
+        String generatedPath = scriptDir.getAbsolutePath() + "/generated";
+        String resultPath = tempDirPath + "/result.zip";
+        File resultFile = ZipUtil.zip(generatedPath, resultPath);
+
+        response.setContentType("application/octet-stream;charset=UTF-8");
+        response.setHeader("Content-Disposition","attachment; filename="+resultFile.getName());
+
+        Files.copy(resultFile.toPath(),response.getOutputStream());
+
+        //清理文件
+        CompletableFuture.runAsync(()->FileUtil.del(tempDirPath));
+
+    }
 }
