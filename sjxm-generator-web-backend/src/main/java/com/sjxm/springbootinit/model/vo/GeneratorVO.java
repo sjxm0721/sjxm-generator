@@ -1,7 +1,7 @@
 package com.sjxm.springbootinit.model.vo;
 
 import cn.hutool.json.JSONUtil;
-import com.sjxm.springbootinit.meta.Meta;
+import com.sjxm.maker.meta.Meta;
 import com.sjxm.springbootinit.model.entity.Generator;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;

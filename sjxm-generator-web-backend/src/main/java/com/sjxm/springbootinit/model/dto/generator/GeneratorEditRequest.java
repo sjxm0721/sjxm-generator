@@ -1,6 +1,6 @@
 package com.sjxm.springbootinit.model.dto.generator;
 
-import com.sjxm.springbootinit.meta.Meta;
+import com.sjxm.maker.meta.Meta;
 import lombok.Data;
 
 import java.io.Serializable;

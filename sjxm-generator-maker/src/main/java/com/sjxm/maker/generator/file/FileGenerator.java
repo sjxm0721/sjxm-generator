@@ -14,16 +14,6 @@ import java.io.IOException;
 public class FileGenerator {
 
     public static void doGenerate(DataModel dataModel) throws TemplateException, IOException {
-//        String projectPath = System.getProperty("user.dir");
-//        String inputPath = projectPath + File.separator+ "sjxm-generator-demo-projects"+ File.separator+"acm-template";
-//        String outputPath = projectPath;
-//        StaticGenerator.copyFilesByRecursive(inputPath,outputPath);
-//
-//
-//        String dynamicInputPath = projectPath + File.separator+"sjxm-generator-basic"+File.separator + "src/main/resources/templates/MainTemplate.java.ftl";
-//        String dynamicOutputPath = projectPath + File.separator + "acm-template/src/com/sjxm/acm/MainTemplate.java";
-//
-//        StaticGenerator.java.ftl.doGenerate(dynamicInputPath,dynamicOutputPath,mainTemplateConfig);
 
         String projectPath = System.getProperty("user.dir");
         // 整个项目的根路径
